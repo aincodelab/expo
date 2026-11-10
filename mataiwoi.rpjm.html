@@ -70,7 +70,7 @@
 
   .loader-content{
     display:flex; flex-direction:column; align-items:center;
-    gap:26px; padding:40px; max-width:560px; text-align:center;
+    gap:26px; padding:40px; max-width:600px; text-align:center;
   }
 
   .loader-ring{
@@ -86,6 +86,7 @@
   .loader-text{
     font-size:clamp(14px,1.8vh,18px);
     color:var(--text); line-height:1.6; font-weight:500;
+    white-space:pre-line;
   }
 
   .loading-overlay.error .loader-text{
@@ -642,8 +643,8 @@
              onerror="this.style.display='none'">
       </div>
       <div class="titles">
-        <h1>RPJM DESA Mataiwoi</h1>
-        <p>Kecamatan Amonggedo · Kabupaten Konawe · Sulawesi Tenggara · Periode 2000 – 2028</p>
+        <h1>RPJM DESA MATAIWOI</h1>
+        <p id="subtitleText">Kecamatan Amonggedo · Kabupaten Konawe · Sulawesi Tenggara · Periode …</p>
       </div>
     </div>
 
@@ -677,7 +678,7 @@
       <div class="visi-scroll">
         <div class="visi-track" id="visiTrack"></div>
       </div>
-      <div class="visi-foot" id="visiFoot">Visi Pembangunan Desa 2000 – 2028</div>
+      <div class="visi-foot" id="visiFoot">Visi Pembangunan Desa</div>
     </section>
 
     <!-- TABS -->
@@ -710,13 +711,14 @@
 /* =========================================================
    0. KONFIGURASI — GANTI DENGAN URL WEB APP ANDA
    ========================================================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycby0qFxFGyfX7bfoyWGbIvCyvfP7PWiBh4SIRunE5i_uB2dPyAOkjULWs7cGh_Evz_qC/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzUoNZa1q6ww_FmshzhmRy7DLeScOzAW-sdUcWFAPtO8UmHoBVm4lNLF4xZDp2hJIKo/exec';
 
 /* =========================================================
    1. STATE & UTIL
    ========================================================= */
 let VISI_DATA = null;
 let MISI_DATA = [];
+let PERIODE   = { awal: '', akhir: '' };
 
 let activeTab     = "misi";
 let currentAnimId = 0;
@@ -741,6 +743,16 @@ function escapeRegex(s) {
 
 function str(v) {
   return String(v == null ? '' : v).trim();
+}
+
+/** Susun label periode: "2000 – 2028" / "2000" / "s.d. 2028" / "" */
+function formatPeriode(p) {
+  const awal  = str(p && p.awal);
+  const akhir = str(p && p.akhir);
+  if (awal && akhir) return awal + ' – ' + akhir;
+  if (awal)  return 'sejak ' + awal;
+  if (akhir) return 's.d. ' + akhir;
+  return '';
 }
 
 /* =========================================================
@@ -806,15 +818,23 @@ async function loadData() {
   }
 
   const data = json.data || {};
-  VISI_DATA = data.visi || { teks: '', highlight: [], foot: '' };
-  MISI_DATA = Array.isArray(data.misi) ? data.misi : [];
 
-  /* Normalisasi & trim semua teks */
+  /* Periode — dari root, fallback ke visi.* */
+  const rootPeriode = json.periode || {};
+  const visiPeriode = data.visi || {};
+  PERIODE = {
+    awal:  str(rootPeriode.awal  || visiPeriode.periode_awal  || ''),
+    akhir: str(rootPeriode.akhir || visiPeriode.periode_akhir || '')
+  };
+
+  /* Visi */
+  VISI_DATA = data.visi || { teks: '', highlight: [], foot: '' };
   VISI_DATA.teks      = str(VISI_DATA.teks);
   VISI_DATA.foot      = str(VISI_DATA.foot);
   VISI_DATA.highlight = (VISI_DATA.highlight || []).map(str).filter(Boolean);
 
-  MISI_DATA = MISI_DATA.map(function (m) {
+  /* Misi (hierarki) */
+  MISI_DATA = (Array.isArray(data.misi) ? data.misi : []).map(function (m) {
     return {
       no:   (typeof m.no === 'number' ? m.no : str(m.no)),
       teks: str(m.teks),
@@ -866,19 +886,22 @@ function renderVisi() {
 
   if (!VISI_DATA || !VISI_DATA.teks) {
     track.innerHTML = '';
-    if (foot) foot.textContent = 'Visi Pembangunan Desa 2000 – 2028';
+    foot.textContent = 'Visi Pembangunan Desa';
     return;
   }
 
   const itemHTML = buildVisiHTML();
-  /* Duplikat 2× agar loop mulus */
   track.innerHTML =
     '<span class="visi-item">' + itemHTML + '</span>' +
     '<span class="visi-item">' + itemHTML + '</span>';
 
-  if (foot) {
-    foot.textContent = VISI_DATA.foot || 'Visi Pembangunan Desa 2000 – 2028';
+  /* Foot: dari API bila ada, jika kosong → auto dari periode */
+  let footText = str(VISI_DATA.foot);
+  if (!footText) {
+    const p = formatPeriode(PERIODE);
+    footText = p ? ('Visi Pembangunan Desa ' + p) : 'Visi Pembangunan Desa';
   }
+  foot.textContent = footText;
 }
 
 /* =========================================================
@@ -990,7 +1013,20 @@ function emptyState(msg) {
 }
 
 /* =========================================================
-   6. PROGRESS BAR
+   6. SUBTITLE & TITLE DINAMIS (PERIODE)
+   ========================================================= */
+function updateHeaderPeriode() {
+  const p = formatPeriode(PERIODE);
+
+  const subtitleBase = 'Kecamatan Amonggedo · Kabupaten Konawe · Sulawesi Tenggara';
+  $('subtitleText').textContent = subtitleBase + (p ? (' · Periode ' + p) : '');
+
+  const titleBase = 'RPJMDesa Mataiwoi';
+  document.title = p ? (titleBase + ' ' + p) : titleBase;
+}
+
+/* =========================================================
+   7. PROGRESS BAR
    ========================================================= */
 function startProgress(totalDuration) {
   if (progressRaf) { cancelAnimationFrame(progressRaf); progressRaf = null; }
@@ -1016,7 +1052,7 @@ function stopProgress() {
 }
 
 /* =========================================================
-   7. TAB CONFIG
+   8. TAB CONFIG
    ========================================================= */
 const TAB_THEMES = {
   misi:    { c1:"#2fd08a", c2:"#29b6d8" },
@@ -1033,7 +1069,7 @@ const TAB_CONFIG = {
 const TABS = ["misi", "tujuan", "sasaran"];
 
 /* =========================================================
-   8. PAGINASI
+   9. PAGINASI
    ========================================================= */
 function buildUnits(elements) {
   const units = [];
@@ -1098,7 +1134,7 @@ function paginate(units, maxHeight) {
 }
 
 /* =========================================================
-   9. ANIMASI TAB
+   10. ANIMASI TAB
    ========================================================= */
 async function playTabAnimation(name) {
   const animId = ++currentAnimId;
@@ -1113,7 +1149,6 @@ async function playTabAnimation(name) {
   const allEls = Array.from(grid.querySelectorAll('.group-head, .misi-card, .tujuan-card, .sasaran-card'));
 
   if (allEls.length === 0) {
-    /* Tab kosong: lewati setelah 2 detik */
     await sleep(2000);
     if (animId !== currentAnimId) return;
     nextTab();
@@ -1162,7 +1197,6 @@ async function playTabAnimation(name) {
   for (const page of pages) {
     if (animId !== currentAnimId) return;
 
-    /* Tampilkan elemen halaman (opacity 0) */
     page.forEach(function (u) {
       if (u.type === 'head') u.el.style.display = 'flex';
       else u.cards.forEach(function (c) { c.el.style.display = 'flex'; });
@@ -1177,7 +1211,6 @@ async function playTabAnimation(name) {
     });
     void panel.offsetHeight;
 
-    /* Fade-in satu per satu (kiri-kanan satu baris bersama) */
     for (const u of page) {
       if (animId !== currentAnimId) return;
       if (u.type === 'head') {
@@ -1188,11 +1221,9 @@ async function playTabAnimation(name) {
       await sleep(stagger);
     }
 
-    /* Tahan */
     await sleep(hold);
     if (animId !== currentAnimId) return;
 
-    /* Fade-out */
     page.forEach(function (u) {
       if (u.type === 'head') u.el.classList.remove('visible');
       else u.cards.forEach(function (c) { c.el.classList.remove('visible'); });
@@ -1200,7 +1231,6 @@ async function playTabAnimation(name) {
     await sleep(1000);
     if (animId !== currentAnimId) return;
 
-    /* Hide */
     page.forEach(function (u) {
       if (u.type === 'head') u.el.style.display = 'none';
       else u.cards.forEach(function (c) { c.el.style.display = 'none'; });
@@ -1214,7 +1244,7 @@ async function playTabAnimation(name) {
 }
 
 /* =========================================================
-   10. TAB SWITCHING
+   11. TAB SWITCHING
    ========================================================= */
 function pulseFlash() {
   const flash = $('flash');
@@ -1250,7 +1280,7 @@ document.querySelectorAll(".tab").forEach(function (btn) {
 });
 
 /* =========================================================
-   11. FULLSCREEN
+   12. FULLSCREEN
    ========================================================= */
 const fsBtn = $("fsBtn");
 function isFullscreen() {
@@ -1275,7 +1305,7 @@ document.addEventListener("fullscreenchange", updateFsBtn);
 document.addEventListener("webkitfullscreenchange", updateFsBtn);
 
 /* =========================================================
-   12. KEYBOARD
+   13. KEYBOARD
    ========================================================= */
 document.addEventListener("keydown", function (e) {
   if (e.key === "ArrowRight") { e.preventDefault(); nextTab(); }
@@ -1290,7 +1320,7 @@ document.addEventListener("keydown", function (e) {
 });
 
 /* =========================================================
-   13. JAM & TANGGAL
+   14. JAM & TANGGAL
    ========================================================= */
 const HARI  = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
 const BULAN = ["Januari","Februari","Maret","April","Mei","Juni",
@@ -1307,7 +1337,7 @@ function tickClock() {
 }
 
 /* =========================================================
-   14. TICKER BAWAH
+   15. TICKER BAWAH
    ========================================================= */
 function buildTicker() {
   const totalMisi    = MISI_DATA.length;
@@ -1320,8 +1350,12 @@ function buildTicker() {
     ? VISI_DATA.highlight.join(' · ')
     : 'Maju · Mandiri · Sejahtera · Berbudaya';
 
+  const periodeStr = formatPeriode(PERIODE);
+  const periodeLabel = periodeStr ? ('Periode ' + periodeStr) : 'Periode Pembangunan';
+
   const text =
-    "<span>📘 <b>RPJMDesa Desa Mataiwoi 2000 – 2028</b>" +
+    "<span>📘 <b>RPJMDesa Desa Mataiwoi</b>" +
+    " &nbsp;·&nbsp; " + escapeHTML(periodeLabel) +
     " &nbsp;·&nbsp; Kecamatan Amonggedo, Kabupaten Konawe, Sulawesi Tenggara" +
     " &nbsp;·&nbsp; <b>Visi:</b> " + escapeHTML(visiShort) +
     " &nbsp;·&nbsp; <b>" + totalMisi + " Misi</b> · <b>" + totalTujuan + " Tujuan</b> · <b>" + totalSasaran + " Sasaran</b>" +
@@ -1333,11 +1367,10 @@ function buildTicker() {
 }
 
 /* =========================================================
-   15. INIT
+   16. INIT
    ========================================================= */
 async function init() {
   if (hasStarted) {
-    /* Retry: reset animasi yang berjalan */
     currentAnimId++;
     stopProgress();
   }
@@ -1345,16 +1378,15 @@ async function init() {
   showLoading('Memuat data RPJMDesa…');
 
   try {
-    const json = await loadData();
+    await loadData();
 
-    /* Render semua konten */
+    updateHeaderPeriode();
     renderVisi();
     renderMisi();
     renderTujuan();
     renderSasaran();
     buildTicker();
 
-    /* Tunggu satu frame agar layout stabil sebelum mengukur tinggi */
     await sleep(120);
     hideLoading();
 
@@ -1362,20 +1394,18 @@ async function init() {
     setTab("misi");
   } catch (err) {
     console.error('[RPJMDesa] Gagal memuat data:', err);
-    showError('Gagal memuat data dari server.\n\n' + (err && err.message ? err.message : 'Periksa koneksi dan pastikan API sudah di-deploy sebagai Web App dengan akses "Anyone".'));
+    showError('Gagal memuat data dari server.\n\n' +
+      (err && err.message ? err.message : 'Periksa koneksi dan pastikan API sudah di-deploy sebagai Web App dengan akses "Anyone".'));
   }
 }
 
-/* Retry button */
 $('retryBtn').addEventListener('click', function () {
   init();
 });
 
-/* Jam mulai lebih awal */
 tickClock();
 setInterval(tickClock, 1000);
 
-/* Mulai setelah dokumen siap */
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   requestAnimationFrame(init);
 } else {
