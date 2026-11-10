@@ -427,33 +427,33 @@
     white-space:nowrap;
   }
 
-  /* BAR list (Pendapatan & Belanja) */
+  /* ═══════════════ BAR LIST (Pendapatan & Belanja detail) ═══════════════ */
   .bars{
     flex:1; min-height:0; display:flex; flex-direction:column;
-    justify-content:space-around; gap:clamp(5px,.9vh,13px);
+    justify-content:space-around; gap:clamp(7px,1.15vh,16px);
     overflow-y:auto; padding-right:4px;
   }
   .bars::-webkit-scrollbar{width:5px}
   .bars::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15); border-radius:9px}
 
-  .bar-row{display:flex; flex-direction:column; gap:5px}
+  .bar-row{display:flex; flex-direction:column; gap:7px}
   .bar-top{display:flex; justify-content:space-between; align-items:baseline; gap:10px}
   .bar-label{
-    font-size:clamp(8.5px,1.15vh,13px); color:#cfe9df; font-weight:600;
+    font-size:clamp(10.5px,1.4vh,15.5px); color:#cfe9df; font-weight:600;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .bar-value{
-    font-size:clamp(8.5px,1.15vh,13px); font-weight:800;
+    font-size:clamp(10.5px,1.4vh,15.5px); font-weight:800;
     font-variant-numeric:tabular-nums; color:#fff; white-space:nowrap;
     display:flex; align-items:baseline; gap:6px;
   }
   .bar-pct{
-    font-size:clamp(7px,.9vh,10px);
+    font-size:clamp(9px,1.15vh,12.5px);
     font-weight:700; color:var(--muted);
     letter-spacing:.02em;
   }
   .bar-track{
-    height:clamp(6px,1.1vh,12px);
+    height:clamp(8px,1.35vh,14px);
     background:rgba(255,255,255,.07);
     border-radius:99px; overflow:hidden;
   }
@@ -498,25 +498,25 @@
   .bidang-bars{
     flex:1; min-height:0;
     display:flex; flex-direction:column;
-    gap:clamp(4px,.8vh,11px);
+    gap:clamp(6px,1.05vh,14px);
     overflow-y:auto; padding-right:5px;
   }
   .bidang-bars::-webkit-scrollbar{width:5px}
   .bidang-bars::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15); border-radius:9px}
 
-  /* PEMBIAYAAN */
+  /* ═══════════════ PEMBIAYAAN detail ═══════════════ */
   .fin-wrap{
     flex:1; min-height:0; display:flex; flex-direction:column;
-    justify-content:space-between; gap:clamp(6px,1vh,14px);
+    justify-content:space-between; gap:clamp(8px,1.15vh,16px);
     overflow-y:auto; padding-right:3px;
   }
   .fin-wrap::-webkit-scrollbar{width:4px}
   .fin-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15); border-radius:9px}
 
-  .fin-group{display:flex; flex-direction:column; gap:clamp(4px,.75vh,9px)}
+  .fin-group{display:flex; flex-direction:column; gap:clamp(6px,.95vh,11px)}
   .fin-group-title{
     display:flex; align-items:center; gap:7px;
-    font-size:clamp(8px,1.05vh,11.5px);
+    font-size:clamp(10px,1.3vh,14px);
     letter-spacing:.08em; text-transform:uppercase; font-weight:800;
     color:var(--muted);
   }
@@ -525,19 +525,19 @@
   .dot.out{background:var(--neg); box-shadow:0 0 10px var(--neg)}
   .fin-sub{
     margin-left:auto; color:#fff; font-weight:800; letter-spacing:0;
-    font-size:clamp(8px,1.05vh,11.5px); font-variant-numeric:tabular-nums;
+    font-size:clamp(10px,1.3vh,14px); font-variant-numeric:tabular-nums;
     white-space:nowrap;
   }
 
-  .fin-row{display:flex; flex-direction:column; gap:3px}
+  .fin-row{display:flex; flex-direction:column; gap:5px}
   .fin-row-top{
     display:flex; justify-content:space-between; gap:8px;
-    font-size:clamp(8px,1.05vh,11.5px);
+    font-size:clamp(10.5px,1.35vh,15px);
   }
   .fin-label{color:#cfe9df; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .fin-value{font-weight:800; color:#fff; font-variant-numeric:tabular-nums; white-space:nowrap}
   .fin-track{
-    height:clamp(4px,.75vh,8px);
+    height:clamp(6px,.95vh,10px);
     background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden;
   }
   .fin-fill{
@@ -547,7 +547,7 @@
   }
 
   .fin-empty{
-    font-size:clamp(8px,1vh,11px); color:var(--muted);
+    font-size:clamp(10px,1.25vh,13px); color:var(--muted);
     font-style:italic; padding:4px 0;
   }
 
@@ -564,13 +564,13 @@
     border-color:color-mix(in srgb, var(--neg) 32%, transparent);
   }
   .fin-neto-label{
-    font-size:clamp(8.5px,1.1vh,12px); letter-spacing:.1em;
+    font-size:clamp(9px,1.15vh,13px); letter-spacing:.1em;
     text-transform:uppercase; font-weight:800; color:var(--accent-main-3);
   }
   .fin-neto.neg .fin-neto-label{color:var(--neg)}
-  .fin-neto-note{font-size:clamp(7px,.95vh,10.5px); color:var(--muted); margin-top:2px}
+  .fin-neto-note{font-size:clamp(8px,1vh,11.5px); color:var(--muted); margin-top:2px}
   .fin-neto-value{
-    font-size:clamp(13px,2vh,24px); font-weight:800;
+    font-size:clamp(14px,2.1vh,24px); font-weight:800;
     font-variant-numeric:tabular-nums; color:#fff; white-space:nowrap;
     text-shadow:0 0 16px color-mix(in srgb, var(--accent-main-3) 45%, transparent);
   }
@@ -1268,7 +1268,6 @@ function pulseFlash(){
 }
 
 function setYear(year, resetTimer = true){
-  /* Tolak jika tidak ada DATA atau pendapatan tahun kosong */
   if (!DATA || !DATA[year]) return;
   if (!hasPendapatanData(DATA[year])) return;
   if (!activeYears.includes(year)) return;
@@ -1307,7 +1306,7 @@ function resetYearRotation(){
   clearInterval(yearRotateTimer);
   restartYearProgress();
 
-  if (activeYears.length <= 1) return;   /* tidak perlu rotasi */
+  if (activeYears.length <= 1) return;
   yearRotateTimer = setInterval(nextYear, YEAR_ROTATE_MS);
 }
 
@@ -1317,7 +1316,6 @@ function resetBidangRotation(){
   bidangRotateTimer = setInterval(nextBidang, BIDANG_ROTATE_MS);
 }
 
-/* Event listeners — hanya untuk tab yang aktif */
 document.querySelectorAll('.year-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.disabled) return;
@@ -1413,7 +1411,6 @@ function initApp(){
     return;
   }
 
-  /* Filter hanya tahun yang punya data pendapatan > 0 */
   activeYears = YEAR_ORDER.filter(y => DATA[y] && hasPendapatanData(DATA[y]));
 
   if (!activeYears.length){
@@ -1424,7 +1421,6 @@ function initApp(){
     return;
   }
 
-  /* Disable tab tahun yang pendapatannya kosong */
   document.querySelectorAll('.year-tab').forEach(btn => {
     const y = btn.dataset.year;
     const valid = activeYears.includes(y);
@@ -1438,7 +1434,6 @@ function initApp(){
   tickClock();
   setInterval(tickClock, 1000);
 
-  /* Mulai dari tahun valid pertama */
   setYear(activeYears[0], true);
 }
 
