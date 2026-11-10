@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPJMDesa Mataiwoi 2000–2028</title>
+<title>RPJMDesa Mataiwoi</title>
 <style>
   :root{
     --text:#e8f5ef;
@@ -415,7 +415,6 @@
     opacity:1;pointer-events:auto;
   }
 
-  /* ---------- MISI ---------- */
   .misi-card{border-left:4px solid var(--level-misi)}
   .misi-card.visible:hover{
     background:color-mix(in srgb, var(--level-misi) 7%, transparent);
@@ -435,7 +434,6 @@
   }
   .misi-body{flex:1;min-width:0}
 
-  /* ---------- TUJUAN ---------- */
   .tujuan-card{border-left:4px solid var(--level-tujuan)}
   .tujuan-card.visible:hover{
     background:color-mix(in srgb, var(--level-tujuan) 7%, transparent);
@@ -455,7 +453,6 @@
   }
   .tujuan-body{flex:1;min-width:0}
 
-  /* ---------- SASARAN ---------- */
   .sasaran-card{border-left:4px solid var(--level-sasaran)}
   .sasaran-card.visible:hover{
     background:color-mix(in srgb, var(--level-sasaran) 7%, transparent);
@@ -478,7 +475,6 @@
   }
   .sasaran-body{flex:1;min-width:0}
 
-  /* ---------- SHARED BODY ---------- */
   .level-label{
     font-size:clamp(11px,1.5vh,16px);
     letter-spacing:.22em;font-weight:800;text-transform:uppercase;
@@ -521,7 +517,6 @@
     color:#c4b5fd;
   }
 
-  /* ---------- INDICATOR ---------- */
   .indikator{
     margin-top:clamp(10px,1.3vh,14px);
     padding:clamp(9px,1.2vh,13px) clamp(12px,1.2vw,17px);
@@ -538,7 +533,6 @@
     margin-right:6px;
   }
 
-  /* ================= GROUP HEAD ================= */
   .group-head{
     display:flex;align-items:center;gap:12px;
     padding-bottom:clamp(8px,1.1vh,12px);
@@ -571,7 +565,6 @@
     flex:1;min-width:0;
   }
 
-  /* ================= TICKER BAWAH ================= */
   .ticker{
     position:relative;overflow:hidden;border-radius:12px;flex:none;
     background:rgba(255,255,255,.04);
@@ -591,7 +584,6 @@
   .ticker-track b{color:var(--visi-c1);font-weight:800}
   @keyframes marquee{to{transform:translateX(-50%)}}
 
-  /* ================= RESPONSIF ================= */
   @media (max-width: 1000px){
     body{height:auto;min-height:100dvh;overflow-y:auto}
     .panels{min-height:520px}
@@ -624,7 +616,6 @@
 
   <div class="flash" id="flash"></div>
 
-  <!-- ================= LOADING OVERLAY ================= -->
   <div class="loading-overlay show" id="loadingOverlay">
     <div class="loader-content">
       <div class="loader-ring" id="loaderRing"></div>
@@ -633,7 +624,6 @@
     </div>
   </div>
 
-  <!-- ================= HEADER ================= -->
   <header class="topbar">
     <div class="brand">
       <div class="logo-wrap">
@@ -644,7 +634,7 @@
       </div>
       <div class="titles">
         <h1>RPJM DESA MATAIWOI</h1>
-        <p id="subtitleText">Kecamatan Amonggedo · Kabupaten Konawe · Sulawesi Tenggara · Periode …</p>
+        <p id="subtitleText">Kecamatan Amonggedo · Kabupaten Konawe · Sulawesi Tenggara</p>
       </div>
     </div>
 
@@ -665,10 +655,8 @@
     </div>
   </header>
 
-  <!-- ================= MAIN ================= -->
   <main class="main">
 
-    <!-- VISI -->
     <section class="visi-card">
       <div class="visi-head">
         <span class="line"></span>
@@ -681,7 +669,6 @@
       <div class="visi-foot" id="visiFoot">Visi Pembangunan Desa</div>
     </section>
 
-    <!-- TABS -->
     <nav class="tabs" id="tabs">
       <button class="tab active" data-tab="misi">Misi</button>
       <button class="tab" data-tab="tujuan">Tujuan</button>
@@ -689,7 +676,6 @@
       <div class="tab-progress"><span id="tabProgress"></span></div>
     </nav>
 
-    <!-- PANELS -->
     <div class="panels">
       <div class="panel active" data-panel="misi">
         <div class="card-grid" id="misiGrid"></div>
@@ -745,7 +731,7 @@ function str(v) {
   return String(v == null ? '' : v).trim();
 }
 
-/** Susun label periode: "2000 – 2028" / "2000" / "s.d. 2028" / "" */
+/** Format periode: "2000 – 2028" / "sejak 2000" / "s.d. 2028" / "" */
 function formatPeriode(p) {
   const awal  = str(p && p.awal);
   const akhir = str(p && p.akhir);
@@ -756,7 +742,22 @@ function formatPeriode(p) {
 }
 
 /* =========================================================
-   2. LOADING / ERROR OVERLAY
+   2. TITLE DINAMIS
+   ========================================================= */
+function setDocumentTitle(state) {
+  const base = 'RPJMDesa Mataiwoi';
+  if (state === 'loading') {
+    document.title = base + ' · Memuat…';
+  } else if (state === 'error') {
+    document.title = base + ' · Error';
+  } else {
+    const p = formatPeriode(PERIODE);
+    document.title = p ? (base + ' ' + p) : base;
+  }
+}
+
+/* =========================================================
+   3. LOADING / ERROR OVERLAY
    ========================================================= */
 function showLoading(text) {
   const ov   = $('loadingOverlay');
@@ -768,6 +769,7 @@ function showLoading(text) {
   ring.style.display = 'block';
   txt.textContent = text || 'Memuat data RPJMDesa…';
   btn.style.display = 'none';
+  setDocumentTitle('loading');
 }
 
 function showError(msg) {
@@ -780,6 +782,7 @@ function showError(msg) {
   ring.style.display = 'none';
   txt.textContent = msg;
   btn.style.display = 'inline-block';
+  setDocumentTitle('error');
 }
 
 function hideLoading() {
@@ -787,7 +790,7 @@ function hideLoading() {
 }
 
 /* =========================================================
-   3. LOAD DATA DARI API
+   4. LOAD DATA DARI API
    ========================================================= */
 async function loadData() {
   if (!API_URL || API_URL.indexOf('GANTI_') === 0) {
@@ -819,21 +822,21 @@ async function loadData() {
 
   const data = json.data || {};
 
-  /* Periode — dari root, fallback ke visi.* */
+  /* PERIODE — dari root, fallback ke visi.* */
   const rootPeriode = json.periode || {};
-  const visiPeriode = data.visi || {};
+  const visiObj     = data.visi || {};
   PERIODE = {
-    awal:  str(rootPeriode.awal  || visiPeriode.periode_awal  || ''),
-    akhir: str(rootPeriode.akhir || visiPeriode.periode_akhir || '')
+    awal:  str(rootPeriode.awal  || visiObj.periode_awal  || ''),
+    akhir: str(rootPeriode.akhir || visiObj.periode_akhir || '')
   };
 
-  /* Visi */
-  VISI_DATA = data.visi || { teks: '', highlight: [], foot: '' };
+  /* VISI */
+  VISI_DATA = visiObj;
   VISI_DATA.teks      = str(VISI_DATA.teks);
   VISI_DATA.foot      = str(VISI_DATA.foot);
   VISI_DATA.highlight = (VISI_DATA.highlight || []).map(str).filter(Boolean);
 
-  /* Misi (hierarki) */
+  /* MISI (hierarki) */
   MISI_DATA = (Array.isArray(data.misi) ? data.misi : []).map(function (m) {
     return {
       no:   (typeof m.no === 'number' ? m.no : str(m.no)),
@@ -858,7 +861,17 @@ async function loadData() {
 }
 
 /* =========================================================
-   4. RENDER: VISI (MARQUEE)
+   5. HEADER: SUBTITLE + TITLE OTOMATIS
+   ========================================================= */
+function updateHeaderPeriode() {
+  const p = formatPeriode(PERIODE);
+  const subtitleBase = 'Kecamatan Amonggedo · Kabupaten Konawe · Sulawesi Tenggara';
+  $('subtitleText').textContent = subtitleBase + (p ? (' · Periode ' + p) : '');
+  setDocumentTitle('ready');
+}
+
+/* =========================================================
+   6. RENDER: VISI
    ========================================================= */
 function buildVisiHTML() {
   if (!VISI_DATA || !VISI_DATA.teks) return '';
@@ -895,7 +908,6 @@ function renderVisi() {
     '<span class="visi-item">' + itemHTML + '</span>' +
     '<span class="visi-item">' + itemHTML + '</span>';
 
-  /* Foot: dari API bila ada, jika kosong → auto dari periode */
   let footText = str(VISI_DATA.foot);
   if (!footText) {
     const p = formatPeriode(PERIODE);
@@ -905,7 +917,7 @@ function renderVisi() {
 }
 
 /* =========================================================
-   5. RENDER: MISI / TUJUAN / SASARAN
+   7. RENDER: MISI / TUJUAN / SASARAN
    ========================================================= */
 function renderMisi() {
   if (!MISI_DATA.length) {
@@ -1013,20 +1025,7 @@ function emptyState(msg) {
 }
 
 /* =========================================================
-   6. SUBTITLE & TITLE DINAMIS (PERIODE)
-   ========================================================= */
-function updateHeaderPeriode() {
-  const p = formatPeriode(PERIODE);
-
-  const subtitleBase = 'Kecamatan Amonggedo · Kabupaten Konawe · Sulawesi Tenggara';
-  $('subtitleText').textContent = subtitleBase + (p ? (' · Periode ' + p) : '');
-
-  const titleBase = 'RPJMDesa Mataiwoi';
-  document.title = p ? (titleBase + ' ' + p) : titleBase;
-}
-
-/* =========================================================
-   7. PROGRESS BAR
+   8. PROGRESS BAR
    ========================================================= */
 function startProgress(totalDuration) {
   if (progressRaf) { cancelAnimationFrame(progressRaf); progressRaf = null; }
@@ -1052,7 +1051,7 @@ function stopProgress() {
 }
 
 /* =========================================================
-   8. TAB CONFIG
+   9. TAB CONFIG
    ========================================================= */
 const TAB_THEMES = {
   misi:    { c1:"#2fd08a", c2:"#29b6d8" },
@@ -1069,7 +1068,7 @@ const TAB_CONFIG = {
 const TABS = ["misi", "tujuan", "sasaran"];
 
 /* =========================================================
-   9. PAGINASI
+   10. PAGINASI
    ========================================================= */
 function buildUnits(elements) {
   const units = [];
@@ -1134,7 +1133,7 @@ function paginate(units, maxHeight) {
 }
 
 /* =========================================================
-   10. ANIMASI TAB
+   11. ANIMASI TAB
    ========================================================= */
 async function playTabAnimation(name) {
   const animId = ++currentAnimId;
@@ -1155,20 +1154,17 @@ async function playTabAnimation(name) {
     return;
   }
 
-  /* Reset */
   allEls.forEach(function (el) {
     el.classList.remove('visible');
     el.style.display = 'none';
     el.style.transition = 'none';
   });
 
-  /* Show all untuk pengukuran */
   allEls.forEach(function (el) { el.style.display = 'flex'; });
   void panel.offsetHeight;
   await sleep(50);
   if (animId !== currentAnimId) return;
 
-  /* Ukur tinggi panel */
   const pStyle = getComputedStyle(panel);
   const maxHeight = panel.clientHeight
     - parseFloat(pStyle.paddingTop)
@@ -1178,7 +1174,6 @@ async function playTabAnimation(name) {
   const units = buildUnits(allEls);
   const pages = paginate(units, maxHeight);
 
-  /* Kembalikan ke hidden */
   allEls.forEach(function (el) {
     el.style.display = 'none';
     el.style.transition = '';
@@ -1186,7 +1181,6 @@ async function playTabAnimation(name) {
 
   if (pages.length === 0) { nextTab(); return; }
 
-  /* Total durasi untuk progress bar */
   let totalDuration = 0;
   pages.forEach(function (page) {
     totalDuration += page.length * stagger + hold + 1000;
@@ -1244,7 +1238,7 @@ async function playTabAnimation(name) {
 }
 
 /* =========================================================
-   11. TAB SWITCHING
+   12. TAB SWITCHING
    ========================================================= */
 function pulseFlash() {
   const flash = $('flash');
@@ -1280,7 +1274,7 @@ document.querySelectorAll(".tab").forEach(function (btn) {
 });
 
 /* =========================================================
-   12. FULLSCREEN
+   13. FULLSCREEN
    ========================================================= */
 const fsBtn = $("fsBtn");
 function isFullscreen() {
@@ -1305,7 +1299,7 @@ document.addEventListener("fullscreenchange", updateFsBtn);
 document.addEventListener("webkitfullscreenchange", updateFsBtn);
 
 /* =========================================================
-   13. KEYBOARD
+   14. KEYBOARD
    ========================================================= */
 document.addEventListener("keydown", function (e) {
   if (e.key === "ArrowRight") { e.preventDefault(); nextTab(); }
@@ -1320,7 +1314,7 @@ document.addEventListener("keydown", function (e) {
 });
 
 /* =========================================================
-   14. JAM & TANGGAL
+   15. JAM & TANGGAL
    ========================================================= */
 const HARI  = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
 const BULAN = ["Januari","Februari","Maret","April","Mei","Juni",
@@ -1337,7 +1331,7 @@ function tickClock() {
 }
 
 /* =========================================================
-   15. TICKER BAWAH
+   16. TICKER BAWAH
    ========================================================= */
 function buildTicker() {
   const totalMisi    = MISI_DATA.length;
@@ -1367,7 +1361,7 @@ function buildTicker() {
 }
 
 /* =========================================================
-   16. INIT
+   17. INIT
    ========================================================= */
 async function init() {
   if (hasStarted) {
@@ -1380,7 +1374,7 @@ async function init() {
   try {
     await loadData();
 
-    updateHeaderPeriode();
+    updateHeaderPeriode();   /* subtitle + document.title dari periode */
     renderVisi();
     renderMisi();
     renderTujuan();
